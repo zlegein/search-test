@@ -1,10 +1,11 @@
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-def path = '/Users/zach/Documents/sample_text'
+def path = './sample_text'
 def files = ['hitchhikers.txt', 'french_armed_forces.txt', 'warp_drive.txt']
 
 def loadFile(file) {
+    println file
     return new File(file).text
 }
 
@@ -60,12 +61,7 @@ Map loadHashes() {
 //        }
 //    }
 //    return wordCountMap
-//        
-        
-        
-    
-    
-    
+//            
 //    Scanner sc = new Scanner(new File(file))
 //    while(sc.hasNextLine()) {
 //        def Scanner s = new Scanner(sc.nextLine())
@@ -84,7 +80,7 @@ Map loadHashes() {
 //        }
 //    }
 //    return map
-}            
+//}            
     
     
     
@@ -92,22 +88,22 @@ Map loadHashes() {
 def start = System.nanoTime()
 files.each {
     def text = loadFile("${path}/${it}")
-    count = exhaustiveSearch(text,'is')
+    count = exhaustiveSearch(text,'a')
     println "${it}: ${count}"
 }
 def elapsedTime = System.nanoTime() - start
-println "EXHAUSTIVE SEARCH TOOK: ${(double)elapsedTime / 1000000000.0} seconds"
+println "EXHAUSTIVE SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
 
 
 
 start = System.nanoTime()
 files.each {
     def text = loadFile("${path}/${it}")
-    count = regexSearch(text,'is')
+    count = regexSearch(text,'a')
     println "${it}: ${count}"
 }
 elapsedTime = System.nanoTime() - start
-println "REGEX SEARCH TOOK: ${(double)elapsedTime / 1000000000.0} seconds"
+println "REGEX SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
 
 
 
@@ -120,13 +116,12 @@ files.each {
 
 start = System.nanoTime()
 hashes.each {k, v ->
-    count = regexSearch(v,'is')
+    count = regexSearch(v,'a')
     println "${k}: ${count}"
     
 }
 elapsedTime = System.nanoTime() - start
-println "HASH SEARCH TOOK: ${(double)elapsedTime / 1000000000.0} seconds"
-
+println "HASH SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
 
 
 

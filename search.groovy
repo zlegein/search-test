@@ -1,11 +1,15 @@
+@Grapes(
+    @Grab(group='org.apache.commons', module='commons-lang3', version='3.0')
+)
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import org.apache.commons.lang3.RandomStringUtils
 
-def path = './sample_text'
+def path = '/Users/zach/workspace/search-test/sample_text'
 def files = ['hitchhikers.txt', 'french_armed_forces.txt', 'warp_drive.txt']
 
 def loadFile(file) {
-    println file
     return new File(file).text
 }
 
@@ -33,63 +37,36 @@ def regexSearch(text, pattern) {
     count
 }
 
-Map loadHashes() {
-    Map hashes = [:]
-    files.each {
-        hashes.put(it, loadFile("${path}/${it}"))
+Map loadHashSearch(file) {
+
+    Map<String, Integer> map = new HashMap<String, Integer>()
+            
+    Scanner sc = new Scanner(new File(file))
+    while(sc.hasNext()) {
+        def word = sc.next()
+        if(map.containsKey(word)) {
+            def temp = map.get(word) + 1
+            map.put(word,temp)
+        } else {
+            map.put(word, 1)
+        }              
     }
-}
-
-//Map loadHashSearch(file) {
-//    Map wordCountMap = [:]
-//    Pattern p = Pattern.compile('\\w*')
-//    Matcher m = p.matcher("this is a this test is this nice")
-//    while(m.find()) {
-//        String word = m.group()        
-//        if(word) {                                  
-//            if(wordCountMap["$word"]) {
-//                Integer count = wordCountMap["$word"]
-//                println "what is count:  $count"
-//                wordCountMap["$word"] = count++
-//                println "setting word: ${word} to count ${count}"
-//            } else {
-//                count = 1
-//                wordCountMap["$word"] = new Integer(count)
-////                println "word ${word} is a new entry setting 1"
-//            }
-//            println "$word : $count"
-//        }
-//    }
-//    return wordCountMap
-//            
-//    Scanner sc = new Scanner(new File(file))
-//    while(sc.hasNextLine()) {
-//        def Scanner s = new Scanner(sc.nextLine())
-//        while(s.hasNext()) {
-//            def word = s.next()
-//            if(word) {
-//                def count = map[word]
-//                if(count) {
-//                    map[word] = count++
-//                    println "setting word: ${word} to count ${count}"
-//                } else {
-//                    map[word] = 1
-//                    println "word ${word} is a new entry setting 1"
-//                }               
-//            }
-//        }
-//    }
-//    return map
-//}            
+    return map
+}            
     
-    
-    
-
+ 
 def start = System.nanoTime()
-files.each {
-    def text = loadFile("${path}/${it}")
-    count = exhaustiveSearch(text,'a')
-    println "${it}: ${count}"
+files.each { file ->
+    def text = loadFile("${path}/${file}")
+    def hits = 0
+    def misses = 0
+    (1..1000).each {
+        pattern = RandomStringUtils.random(3, "aeiourstwdhmn".getChars())    
+        count = exhaustiveSearch(text,pattern)
+        if(count > 0) hits++
+        else misses++
+    }        
+    println "${file}: ${hits} hits, ${misses} misses"
 }
 def elapsedTime = System.nanoTime() - start
 println "EXHAUSTIVE SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
@@ -97,32 +74,43 @@ println "EXHAUSTIVE SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds
 
 
 start = System.nanoTime()
-files.each {
-    def text = loadFile("${path}/${it}")
-    count = regexSearch(text,'a')
-    println "${it}: ${count}"
+files.each { file ->
+    def text = loadFile("${path}/${file}")
+    def hits = 0
+    def misses = 0
+    (1..1000).each {
+        pattern = RandomStringUtils.random(3, "aeiourstwdhmn".getChars())    
+        count = regexSearch(text,pattern)
+        if(count > 0) hits++
+        else misses++
+    }        
+    println "${file}: ${hits} hits, ${misses} misses"
 }
 elapsedTime = System.nanoTime() - start
 println "REGEX SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
 
 
 
-Map hashes = [:]
+Map<String, Map<String, Integer>> hashes = [:]
 files.each {
-    hashes.put(it, loadFile("${path}/${it}"))
+    hashes.put(it, loadHashSearch("${path}/${it}"))
 }
 
-
-
 start = System.nanoTime()
-hashes.each {k, v ->
-    count = regexSearch(v,'a')
-    println "${k}: ${count}"
+hashes.each {file, map ->
+    def hits = 0
+    def misses = 0
+    (1..1000).each {
+        pattern = RandomStringUtils.random(2, "aeiourstwdhmn".getChars())    
+        count = map.get(pattern)
+        if(count > 0) hits++
+        else misses++
+    }        
+    println "${file}: ${hits} hits, ${misses} misses"
     
 }
 elapsedTime = System.nanoTime() - start
 println "HASH SEARCH TOOK: ${(double)elapsedTime / 1000000.0} milliseconds"
-
 
 
 

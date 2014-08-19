@@ -63,7 +63,7 @@ files.each { file ->
     (1..1000).each {
         pattern = RandomStringUtils.random(3, "aeiourstwdhmn".getChars())    
         count = exhaustiveSearch(text,pattern)
-        if(count > 0) hits++
+        if(count > 0) hits += count
         else misses++
     }        
     println "${file}: ${hits} hits, ${misses} misses"
@@ -81,7 +81,7 @@ files.each { file ->
     (1..1000).each {
         pattern = RandomStringUtils.random(3, "aeiourstwdhmn".getChars())    
         count = regexSearch(text,pattern)
-        if(count > 0) hits++
+        if(count > 0) hits += count
         else misses++
     }        
     println "${file}: ${hits} hits, ${misses} misses"
@@ -103,7 +103,7 @@ hashes.each {file, map ->
     (1..1000).each {
         pattern = RandomStringUtils.random(2, "aeiourstwdhmn".getChars())    
         count = map.get(pattern)
-        if(count > 0) hits++
+        if(count > 0) hits += count
         else misses++
     }        
     println "${file}: ${hits} hits, ${misses} misses"
